@@ -84,12 +84,7 @@ test_generator = DataGenerator(test_ids)
 csv_logger = CSVLogger('training.log', separator=',', append=False)
 
 callbacks = [
-    keras.callbacks.EarlyStopping(monitor='loss', min_delta=0,
-                               patience=2, verbose=1, mode='auto'),
-    keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=2, min_lr=0.000001, verbose=1),
-    keras.callbacks.ModelCheckpoint(filepath = 'model_.{epoch:02d}-{val_loss:.6f}.m5',
-                             verbose=1, save_best_only=True, save_weights_only = True)
-    
+    keras.callbacks.ReduceLROnPlateau(monitor='val_loss', factor=0.2, patience=2, min_lr=0.000001, verbose=1)
     ]
 
 K.clear_session()
@@ -219,15 +214,6 @@ def showLiverPredictsById(case, start_slice = 60):
     predplot[2].imshow(p[start_slice,:,:,1:4], cmap="BuPu", interpolation='none', alpha=0.3)
     predplot[2].title.set_text('Prediction on test image')
     
-    predplot[3].imshow(edema[start_slice,:,:], cmap="BuPu", interpolation='none', alpha=0.3)
-    predplot[3].title.set_text(f'{CLASSES[2]} predicted')
-    
-    predplot[4].imshow(core[start_slice,:,], cmap="BuPu", interpolation='none', alpha=0.3)
-    predplot[4].title.set_text(f'{CLASSES[1]} predicted')
-    
-    predplot[5].imshow(enhancing[start_slice,:,], cmap="BuPu", interpolation='none', alpha=0.3)
-    predplot[5].title.set_text(f'{CLASSES[3]} predicted')
-    plt.show()
     
 showPredictsById(case=test_ids[21][-3:])
 
