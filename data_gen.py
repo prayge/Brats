@@ -43,8 +43,8 @@ SEGMENT_CLASSES = {
     3 : 'ENHANCING' # original 4 -> converted into 3 later
 }
 
-VOLUME_SLICES = 100 
-VOLUME_START_AT = 22
+SLICES = 100 
+START_SLICE = 22
 IMG_SIZE = 128
 
 TRAIN_DATASET_PATH = 'C:/Users/samue/BraTS2020/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/'
@@ -71,10 +71,10 @@ class DataGenerator(keras.utils.all_utils.Sequence):
         indexes = self.indexes[index*self.batch_size:(index+1)*self.batch_size]
 
         # Find list of IDs
-        Batch_ids = [self.list_IDs[k] for k in indexes]
+        ids = [self.list_IDs[k] for k in indexes]
 
         # Generate data
-        X, y = self.__data_generation(Batch_ids)
+        X, y = self.__data_generation(ids)
 
         return X, y
 
@@ -87,29 +87,29 @@ class DataGenerator(keras.utils.all_utils.Sequence):
     def __data_generation(self, Batch_ids):
         'Generates data containing batch_size samples' # X : (n_samples, *dim, n_channels)
         # Initialization
-        X = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, self.n_channels))
-        y = np.zeros((self.batch_size*VOLUME_SLICES, 240, 240))
-        Y = np.zeros((self.batch_size*VOLUME_SLICES, *self.dim, 4))
+        X = np.zeros((self.batch_size*SLICES, *self.dim, self.n_channels))
+        y = np.zeros((self.batch_size*SLICES, 240, 240))
+        Y = np.zeros((self.batch_size*SLICES, *self.dim, 4))
 
         
         # Generate data
         for c, i in enumerate(Batch_ids):
             case_path = os.path.join(TRAIN_DATASET_PATH, i)
 
-            data_path = os.path.join(case_path, f'{i}_flair.nii');
-            flair = nib.load(data_path).get_fdata()    
+            flair_path = os.path.join(case_path, f'{i}_flair.nii');
+            flair = nib.load(flair_path).get_fdata()    
 
-            data_path = os.path.join(case_path, f'{i}_t1ce.nii');
-            ce = nib.load(data_path).get_fdata()
+            ce_path = os.path.join(case_path, f'{i}_t1ce.nii');
+            ce = nib.load(ce_path).get_fdata()
             
-            data_path = os.path.join(case_path, f'{i}_seg.nii');
-            seg = nib.load(data_path).get_fdata()
+            seg_path = os.path.join(case_path, f'{i}_seg.nii');
+            seg = nib.load(seg_path).get_fdata()
         
-            for j in range(VOLUME_SLICES):
-                 X[j +VOLUME_SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE));
-                 X[j +VOLUME_SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE));
+            for j in range(SLICES):
+                 X[j +SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+START_SLICE], (IMG_SIZE, IMG_SIZE));
+                 X[j +SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+START_SLICE], (IMG_SIZE, IMG_SIZE));
 
-                 y[j +VOLUME_SLICES*c] = seg[:,:,j+VOLUME_START_AT];
+                 y[j +SLICES*c] = seg[:,:,j+START_SLICE];
                     
         # Generate masks
         y[y==4] = 3;
