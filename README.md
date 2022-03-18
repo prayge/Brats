@@ -29,6 +29,9 @@ The framework evaluation results are calculated using Keras submodules and set o
 
 ```python
 Metric Evaluation
-32/32 [==============================] - 11s 241ms/step - loss: 0.2069 - accuracy: 0.9924 - mean_io_u_1: 0.8061 - dice_coef: 0.5741 - precision: 0.9937 - sensitivity: 0.9902 - specificity: 0.9978 - dice_necrotic: 0.4602 - dice_edema: 0.7037 - dice_enhancing: 0.6893
+32/32 [==============================] - 11s 241ms/step - loss: 0.2069 
+- accuracy: 0.9924 - mean_io_u_1: 0.8061 - dice_coef: 0.5741 - precision: 0.9937 
+- sensitivity: 0.9902 - specificity: 0.9978 - dice_necrotic: 0.4602 
+- dice_edema: 0.7037 - dice_enhancing: 0.6893
 
 ```
