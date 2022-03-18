@@ -75,7 +75,6 @@ train_and_test_ids = pathListIntoIds(train_and_val_directories);
     
 train_test_ids, val_ids = train_test_split(train_and_test_ids,test_size=0.15) 
 train_ids, test_ids = train_test_split(train_test_ids,test_size=0.10) 
-np.save('test1.npy',test_ids)
 
 training_generator = DataGenerator(train_ids)
 valid_generator = DataGenerator(val_ids)
