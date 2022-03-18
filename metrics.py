@@ -15,7 +15,7 @@ def dice_coef(y_true, y_pred, smooth=1.0):
         y_pred_f = K.flatten(y_pred[:,:,:,i])
         intersection = K.sum(y_true_f * y_pred_f)
         loss = ((2. * intersection + smooth) / (K.sum(y_true_f) + K.sum(y_pred_f) + smooth))
-   #     K.print_tensor(loss, message='loss value for class {} : '.format(SEGMENT_CLASSES[i]))
+   #     K.print_tensor(loss, message='loss value for class {} : '.format(SEGMENT_CLASSES[i])) d
         if i == 0:
             total_loss = loss
         else:

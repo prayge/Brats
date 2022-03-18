@@ -35,7 +35,7 @@ from tensorflow.keras.callbacks import ModelCheckpoint, ReduceLROnPlateau, Early
 from tensorflow.keras.layers.experimental import preprocessing
 
 
-# Make numpy printouts easier to read.
+# Make numpy printouts easier to read
 np.set_printoptions(precision=3, suppress=True)
 
 CLASSES = {
@@ -75,7 +75,7 @@ train_and_test_ids = pathListIntoIds(train_and_val_directories);
     
 train_test_ids, val_ids = train_test_split(train_and_test_ids,test_size=0.15) 
 train_ids, test_ids = train_test_split(train_test_ids,test_size=0.10) 
-np.save('historyBinary.npy',test_ids)
+np.save('test1.npy',test_ids)
 
 training_generator = DataGenerator(train_ids)
 valid_generator = DataGenerator(val_ids)
@@ -89,18 +89,18 @@ callbacks = [
 
 K.clear_session()
 
-############ train model ################
-#history =  model.fit(training_generator,
+# ########### train model ################
+# history =  model.fit(training_generator,
 #                     epochs=35,
 #                    steps_per_epoch=len(train_ids),
 #                    callbacks= callbacks,
 #                   validation_data = valid_generator
 #                    )  
-#np.save('historyBinary.npy',history.history)
-#model.save("binaryCross35.h5")
+# np.save('test1.npy',history.history)
+# model.save("test1.h5")
 
 ############ load trained model ################
-model = keras.models.load_model('C:/Users/samue/bratsUnet/model_x1_1.h5', 
+model = keras.models.load_model('C:/Users/samue/bratsUnet/brats_3d.h5', 
                                    custom_objects={ 'accuracy' : tf.keras.metrics.MeanIoU(num_classes=4),
                                                    "dice_coef": dice_coef,
                                                    "precision": precision,
@@ -111,29 +111,29 @@ model = keras.models.load_model('C:/Users/samue/bratsUnet/model_x1_1.h5',
                                                    "dice_coef_enhancing": dice_enhancing
                                                    }, compile=False)
 
-history = pd.read_csv('C:/Users/samue/bratsUnet/training_per_class.log', sep=',', engine='python')
-hist=history
-acc=hist['accuracy']
-val_acc=hist['val_accuracy']
-epoch=range(len(acc))
-loss=hist['loss']
-val_loss=hist['val_loss']
-train_dice=hist['dice_coef']
-val_dice=hist['val_dice_coef']
-f,metplot=plt.subplots(1,4,figsize=(16,8))
-metplot[0].plot(epoch,acc,'b',label='Training Accuracy')
-metplot[0].plot(epoch,val_acc,'r',label='Validation Accuracy')
-metplot[0].legend()
-metplot[1].plot(epoch,loss,'b',label='Training Loss')
-metplot[1].plot(epoch,val_loss,'r',label='Validation Loss')
-metplot[1].legend()
-metplot[2].plot(epoch,train_dice,'b',label='Training dice coef')
-metplot[2].plot(epoch,val_dice,'r',label='Validation dice coef')
-metplot[2].legend()
-metplot[3].plot(epoch,hist['mean_io_u'],'b',label='Training mean IOU')
-metplot[3].plot(epoch,hist['val_mean_io_u'],'r',label='Validation mean IOU')
-metplot[3].legend()
-plt.show()
+# history = pd.read_csv('C:/Users/samue/bratsUnet/training_per_class.log', sep=',', engine='python')
+# hist=history
+# acc=hist['accuracy']
+# val_acc=hist['val_accuracy']
+# epoch=range(len(acc))
+# loss=hist['loss'] 
+# val_loss=hist['val_loss']
+# train_dice=hist['dice_coef']
+# val_dice=hist['val_dice_coef']
+# f,metplot=plt.subplots(1,4,figsize=(16,8))
+# metplot[0].plot(epoch,acc,'b',label='Training Accuracy')
+# metplot[0].plot(epoch,val_acc,'r',label='Validation Accuracy')
+# metplot[0].legend()
+# metplot[1].plot(epoch,loss,'b',label='Training Loss')
+# metplot[1].plot(epoch,val_loss,'r',label='Validation Loss')
+# metplot[1].legend()
+# metplot[2].plot(epoch,train_dice,'b',label='Training dice coef')
+# metplot[2].plot(epoch,val_dice,'r',label='Validation dice coef')
+# metplot[2].legend()
+# metplot[3].plot(epoch,hist['mean_io_u'],'b',label='Training mean IOU')
+# metplot[3].plot(epoch,hist['val_mean_io_u'],'r',label='Validation mean IOU')
+# metplot[3].legend()
+# plt.show()
 
 def predictByPath(case_path,case):
     files = next(os.walk(case_path))[2]
@@ -188,35 +188,8 @@ def showPredictsById(case, start_slice = 60):
     predplot[5].title.set_text(f'{CLASSES[3]} predicted')
     plt.show()
     
-def showLiverPredictsById(case, start_slice = 60):
-    path = f"C:/Users/samue/BraTS2020/BraTS2020_TrainingData/MICCAI_BraTS2020_TrainingData/BraTS20_Training_{case}"
-    gt = nib.load(os.path.join(path, f'BraTS20_Training_{case}_seg.nii')).get_fdata()
-    origImage = nib.load(os.path.join(path, f'BraTS20_Training_{case}_flair.nii')).get_fdata()
-    p = predictByPath(path,case)
-
-    core = p[:,:,:,1]
-    edema= p[:,:,:,2]
-    enhancing = p[:,:,:,3]
-
-    plt.figure(figsize=(18, 50))
-    f, predplot = plt.subplots(1,6, figsize = (18, 50)) 
-
-    for i in range(6): # for each image, add brain background
-        predplot[i].imshow(cv2.resize(origImage[:,:,start_slice+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE)), cmap="gray", interpolation='none')
-    
-    predplot[0].imshow(cv2.resize(origImage[:,:,start_slice+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE)), cmap="gray")
-    predplot[0].title.set_text('Validation test image')
-    
-    curr_gt=cv2.resize(gt[:,:,start_slice+VOLUME_START_AT], (IMG_SIZE, IMG_SIZE), interpolation = cv2.INTER_NEAREST)
-    predplot[1].imshow(curr_gt, cmap="BuPu", interpolation='none', alpha=0.3) # ,alpha=0.3,cmap='Reds'
-    predplot[1].title.set_text('Ground truth')
-    
-    predplot[2].imshow(p[start_slice,:,:,1:4], cmap="BuPu", interpolation='none', alpha=0.3)
-    predplot[2].title.set_text('Prediction on test image')
-    
-    
 showPredictsById(case=test_ids[21][-3:])
 
 model.compile(loss="binary_crossentropy", optimizer=tf.keras.optimizers.Adam(learning_rate=0.001), metrics = ['accuracy',tf.keras.metrics.MeanIoU(num_classes=4), dice_coef, precision, sensitivity, specificity, dice_necrotic, dice_edema, dice_enhancing] )
 print("Metric Evaluation")
-results = model.evaluate(test_generator, batch_size=60, callbacks= callbacks)
+results = model.evaluate(test_generator, batch_size=10, callbacks= callbacks)

@@ -91,28 +91,23 @@ class DataGenerator(keras.utils.all_utils.Sequence):
         y = np.zeros((self.batch_size*SLICES, 240, 240))
         Y = np.zeros((self.batch_size*SLICES, *self.dim, 4))
 
-        
         # Generate data
         for c, i in enumerate(Batch_ids):
             case_path = os.path.join(TRAIN_DATASET_PATH, i)
-
+            
             flair_path = os.path.join(case_path, f'{i}_flair.nii');
             flair = nib.load(flair_path).get_fdata()    
-
             ce_path = os.path.join(case_path, f'{i}_t1ce.nii');
             ce = nib.load(ce_path).get_fdata()
-            
             seg_path = os.path.join(case_path, f'{i}_seg.nii');
             seg = nib.load(seg_path).get_fdata()
-        
             for j in range(SLICES):
-                 X[j +SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+START_SLICE], (IMG_SIZE, IMG_SIZE));
-                 X[j +SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+START_SLICE], (IMG_SIZE, IMG_SIZE));
-
-                 y[j +SLICES*c] = seg[:,:,j+START_SLICE];
+                X[j +SLICES*c,:,:,0] = cv2.resize(flair[:,:,j+START_SLICE], (IMG_SIZE, IMG_SIZE));
+                X[j +SLICES*c,:,:,1] = cv2.resize(ce[:,:,j+START_SLICE], (IMG_SIZE, IMG_SIZE));
+                y[j +SLICES*c] = seg[:,:,j+START_SLICE];
                     
         # Generate masks
-        y[y==4] = 3;
-        mask = tf.one_hot(y, 4);
-        Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE));
+        y[y==4] = 3
+        mask = tf.one_hot(y, 4)                
+        Y = tf.image.resize(mask, (IMG_SIZE, IMG_SIZE))
         return X/np.max(X), Y
