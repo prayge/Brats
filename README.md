@@ -1,6 +1,6 @@
 # Brats
 
-## Dataeset 
+## Dataset 
 
 This repository details a U-Net approach to solving the BRaTS Dataset from 2020, using a combination of specific hyperparameters and binary-crossentropy for multi-class segmentation. 
 
